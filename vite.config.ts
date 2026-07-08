@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-const githubPagesBase = '/SGHSS-VidaPuls/'
+const githubPagesBase = '/SGHSS-VidaPlus/'
 
 // https://vite.dev/config/
 export default defineConfig({

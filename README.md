@@ -37,7 +37,7 @@ O projeto está preparado para publicação no GitHub Pages via GitHub Actions.
 
 URL esperada da aplicação publicada:
 
-`https://elderdebertolis-gif.github.io/SGHSS-VidaPuls/`
+`https://elderdebertolis-gif.github.io/SGHSS-VidaPlus/`
 
 ## Observação
 
