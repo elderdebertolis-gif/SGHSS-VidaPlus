@@ -2327,7 +2327,7 @@ function App() {
               </button>
             }
           />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <form className="form-grid" id="patient-form" onSubmit={handleSavePatientProfile}>
                 <label className="form-field"><span>Nome completo</span><input value={patientProfile.name} onChange={(event) => setPatientProfile((current) => ({ ...current, name: event.target.value }))} required /></label>
@@ -2358,7 +2358,7 @@ function App() {
       return (
         <div className="page-grid">
           <SectionIntro eyebrow="Consultas" title="Agendar, visualizar e cancelar consultas" description="Fluxo com especialidade, unidade, profissional, data, horário e comprovante visual." />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>Nova consulta</h2>
               <form className="form-grid" onSubmit={handleScheduleConsultation}>
@@ -3015,7 +3015,7 @@ function App() {
             title="Cadastro, filtros e situação assistencial"
             description="Fluxo administrativo com criação, edição, visualização e inativação simulada."
           />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>{editingPatientId ? 'Editar paciente' : 'Novo paciente'}</h2>
               <form className="form-grid" onSubmit={handleCreateAdminPatient}>
@@ -3095,7 +3095,7 @@ function App() {
             </Panel>
             <Panel>
               <div className="table-wrapper">
-                <table className="data-table">
+                <table className="data-table data-table--cards">
                   <thead>
                     <tr>
                       <th>Paciente</th>
@@ -3108,16 +3108,16 @@ function App() {
                   <tbody>
                     {filteredAdminPatients.map((item) => (
                       <tr key={item.id}>
-                        <td>
+                        <td data-label="Paciente">
                           <strong>{item.name}</strong>
                           <span>{item.careType}</span>
                         </td>
-                        <td>{item.unit}</td>
-                        <td>
+                        <td data-label="Unidade">{item.unit}</td>
+                        <td data-label="Status">
                           <StatusBadge status={item.status} />
                         </td>
-                        <td>{item.nextStep}</td>
-                        <td>
+                        <td data-label="Próximo passo">{item.nextStep}</td>
+                        <td data-label="Ações">
                           <div className="button-row">
                             <button className="button button--ghost" type="button" onClick={() => handleEditPatient(item)}>
                               Editar
@@ -3149,7 +3149,7 @@ function App() {
             title="Escalas, unidades e níveis de acesso"
             description="Cadastro demonstrativo de medicos, enfermagem e equipes de apoio."
           />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>{editingProfessionalId ? 'Editar profissional' : 'Novo profissional'}</h2>
               <form className="form-grid" onSubmit={handleCreateProfessional}>
@@ -3224,7 +3224,7 @@ function App() {
             </Panel>
             <Panel>
               <div className="table-wrapper">
-                <table className="data-table">
+                <table className="data-table data-table--cards">
                   <thead>
                     <tr>
                       <th>Profissional</th>
@@ -3237,16 +3237,16 @@ function App() {
                   <tbody>
                     {filteredProfessionals.map((item) => (
                       <tr key={item.id}>
-                        <td>
+                        <td data-label="Profissional">
                           <strong>{item.name}</strong>
                           <span>{item.role}</span>
                         </td>
-                        <td>{item.unit}</td>
-                        <td>{item.shift}</td>
-                        <td>
+                        <td data-label="Unidade">{item.unit}</td>
+                        <td data-label="Turno">{item.shift}</td>
+                        <td data-label="Status">
                           <StatusBadge status={item.status} />
                         </td>
-                        <td>
+                        <td data-label="Ações">
                           <div className="button-row">
                             <button className="button button--ghost" type="button" onClick={() => handleEditProfessional(item)}>
                               Editar
@@ -3278,7 +3278,7 @@ function App() {
             title="Hospitais, clínicas, laboratório e home care"
             description="Cadastro e acompanhamento das unidades com status, ocupação e especialidades."
           />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--form-aside">
             <Panel>
               <h2>{editingUnitId ? 'Editar unidade' : 'Nova unidade'}</h2>
               <form className="form-grid" onSubmit={handleCreateUnit}>
@@ -3366,7 +3366,7 @@ function App() {
             </Panel>
             <Panel>
               <div className="table-wrapper">
-                <table className="data-table">
+                <table className="data-table data-table--cards">
                   <thead>
                     <tr>
                       <th>Unidade</th>
@@ -3379,16 +3379,16 @@ function App() {
                   <tbody>
                     {filteredUnits.map((item) => (
                       <tr key={item.id}>
-                        <td>
+                        <td data-label="Unidade">
                           <strong>{item.name}</strong>
                           <span>{item.specialties.join(', ')}</span>
                         </td>
-                        <td>{item.type}</td>
-                        <td>{item.city}</td>
-                        <td>
+                        <td data-label="Tipo">{item.type}</td>
+                        <td data-label="Cidade">{item.city}</td>
+                        <td data-label="Status">
                           <StatusBadge status={item.status} />
                         </td>
-                        <td>
+                        <td data-label="Ações">
                           <div className="button-row">
                             <button className="button button--ghost" type="button" onClick={() => handleEditUnit(item)}>
                               Editar
@@ -3680,7 +3680,7 @@ function App() {
     }
 
     if (currentView === 'supplies') {
-      return <div className="page-grid"><SectionIntro eyebrow="Suprimentos" title="Estoque, mínimo e status de reposição" description="Itens críticos recebem destaque visual e permitem leitura rápida." /><div className="toolbar"><select value={supplyStatusFilter} onChange={(event) => setSupplyStatusFilter(event.target.value)}><option value="Todos">Todos</option><option value="Crítico">Crítico</option><option value="Alerta">Alerta</option><option value="Estável">Estável</option></select></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Estoque crítico</h2><p className="lead-text">{criticalSupplies} item(ns) abaixo do limite mínimo.</p><p>Reposição priorizada nas unidades com maior consumo operacional.</p></Panel><Panel><div className="table-wrapper"><table className="data-table"><thead><tr><th>Item</th><th>Categoria</th><th>Unidade</th><th>Estoque</th><th>Status</th></tr></thead><tbody>{filteredSupplies.map((item) => (<tr key={item.id}><td><strong>{item.item}</strong><span>{item.trend}</span></td><td>{item.category}</td><td>{item.unit}</td><td>{item.stock} / mínimo {item.minStock}</td><td><StatusBadge status={item.status} /></td></tr>))}</tbody></table></div></Panel></div></div>
+      return <div className="page-grid"><SectionIntro eyebrow="Suprimentos" title="Estoque, mínimo e status de reposição" description="Itens críticos recebem destaque visual e permitem leitura rápida." /><div className="toolbar"><select value={supplyStatusFilter} onChange={(event) => setSupplyStatusFilter(event.target.value)}><option value="Todos">Todos</option><option value="Crítico">Crítico</option><option value="Alerta">Alerta</option><option value="Estável">Estável</option></select></div><div className="content-grid content-grid--wide content-grid--form-aside"><Panel className="panel--accent"><h2>Estoque crítico</h2><p className="lead-text">{criticalSupplies} item(ns) abaixo do limite mínimo.</p><p>Reposição priorizada nas unidades com maior consumo operacional.</p></Panel><Panel><div className="table-wrapper"><table className="data-table data-table--cards"><thead><tr><th>Item</th><th>Categoria</th><th>Unidade</th><th>Estoque</th><th>Status</th></tr></thead><tbody>{filteredSupplies.map((item) => (<tr key={item.id}><td data-label="Item"><strong>{item.item}</strong><span>{item.trend}</span></td><td data-label="Categoria">{item.category}</td><td data-label="Unidade">{item.unit}</td><td data-label="Estoque">{item.stock} / mínimo {item.minStock}</td><td data-label="Status"><StatusBadge status={item.status} /></td></tr>))}</tbody></table></div></Panel></div></div>
     }
 
     if (currentView === 'finance') {
@@ -3699,7 +3699,7 @@ function App() {
             title="Logs críticos e histórico de acessos"
             description="Rastreabilidade das principais ações, com filtros por usuário, perfil, data, ação e módulo."
           />
-          <div className="content-grid content-grid--wide">
+          <div className="content-grid content-grid--wide content-grid--detail-aside">
             <Panel>
               <div className="toolbar toolbar--dense">
                 <input
@@ -3738,7 +3738,7 @@ function App() {
                 </select>
               </div>
               <div className="table-wrapper">
-                <table className="data-table">
+                <table className="data-table data-table--cards">
                   <thead>
                     <tr>
                       <th>Data/Hora</th>
@@ -3755,17 +3755,17 @@ function App() {
                         className={selectedAuditLogId === item.id ? 'is-selected' : ''}
                         onClick={() => setSelectedAuditLogId(item.id)}
                       >
-                        <td>
+                        <td data-label="Data e hora">
                           <strong>{item.date}</strong>
                           <span>{item.time}</span>
                         </td>
-                        <td>
+                        <td data-label="Usuário">
                           {item.user}
                           <span>{item.profile}</span>
                         </td>
-                        <td>{item.action}</td>
-                        <td>{item.module}</td>
-                        <td>{item.ip}</td>
+                        <td data-label="Ação">{item.action}</td>
+                        <td data-label="Módulo">{item.module}</td>
+                        <td data-label="IP">{item.ip}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -3880,7 +3880,7 @@ function App() {
               </span>
             </div>
             <div className="table-wrapper">
-              <table className="data-table">
+              <table className="data-table data-table--cards">
                 <thead>
                   <tr>
                     <th>Usuário</th>
@@ -3896,16 +3896,16 @@ function App() {
                       key={item.id}
                       className={selectedPermissionUser?.id === item.id ? 'is-selected' : ''}
                     >
-                      <td>
+                      <td data-label="Usuário">
                         <strong>{item.name}</strong>
                         <span>{item.login}</span>
                       </td>
-                      <td>{item.profileLabel}</td>
-                      <td>{item.unit}</td>
-                      <td>
+                      <td data-label="Perfil">{item.profileLabel}</td>
+                      <td data-label="Unidade">{item.unit}</td>
+                      <td data-label="Status da conta">
                         <StatusBadge status={item.status} />
                       </td>
-                      <td>
+                      <td data-label="Ações">
                         <div className="button-row">
                           <button
                             className="button button--ghost"
@@ -3929,7 +3929,7 @@ function App() {
               </table>
             </div>
           </Panel>
-          <div className="content-grid content-grid--wide permissions-layout">
+          <div className="content-grid content-grid--wide content-grid--form-aside permissions-layout">
             {selectedPermissionUser ? (
               <>
                 <Panel>
@@ -4020,7 +4020,7 @@ function App() {
                     <StatusBadge status={`${permissionGrantedCount} liberado(s)`} />
                   </div>
                   <div className="table-wrapper">
-                    <table className="data-table">
+                    <table className="data-table data-table--cards">
                       <thead>
                         <tr>
                           <th>Módulo</th>
@@ -4031,8 +4031,8 @@ function App() {
                       <tbody>
                         {permissions.map((item) => (
                           <tr key={item.id}>
-                            <td>{item.module}</td>
-                            <td>
+                            <td data-label="Módulo">{item.module}</td>
+                            <td data-label="Liberação">
                               <select
                                 value={permissionModuleDrafts[item.id] ?? ''}
                                 onChange={(event) =>
@@ -4049,7 +4049,7 @@ function App() {
                                 ))}
                               </select>
                             </td>
-                            <td>{item.note}</td>
+                            <td data-label="Observação">{item.note}</td>
                           </tr>
                         ))}
                       </tbody>
