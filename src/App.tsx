@@ -697,12 +697,12 @@ function App() {
     ? 'Portal do paciente'
     : isProfessionalSession
       ? 'Jornada assistencial'
-      : 'OperaÃ§Ã£o institucional'
+      : 'Operação institucional'
   const workspaceContextDescription = isPatientSession
-    ? 'Acompanhe consultas, exames, prescriÃ§Ãµes e privacidade com navegaÃ§Ã£o simples.'
+    ? 'Acompanhe consultas, exames, prescrições e privacidade com navegação simples.'
     : isProfessionalSession
-      ? 'Use agenda, prontuÃ¡rio, telemedicina e registros clÃ­nicos sem perder contexto.'
-      : 'Gerencie pacientes, unidades, leitos, auditoria e acessos em um sÃ³ ambiente.'
+      ? 'Use agenda, prontuário, telemedicina e registros clínicos sem perder contexto.'
+      : 'Gerencie pacientes, unidades, leitos, auditoria e acessos em um só ambiente.'
   const workspaceSearchPlaceholder = isPatientSession
     ? 'Pesquisar consultas, exames e prescrições...'
     : isProfessionalSession
@@ -4116,9 +4116,15 @@ function App() {
                 <button
                   className="button button--ghost topbar__menu-button"
                   type="button"
+                  aria-label="Abrir menu lateral"
                   onClick={() => setMobileMenuOpen(true)}
                 >
-                  Menu
+                  <span className="topbar__menu-icon" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                  <span className="sr-only">Abrir menu</span>
                 </button>
                 <div className="topbar__identity">
                   <span className="section-intro__eyebrow">{activeMeta.label}</span>

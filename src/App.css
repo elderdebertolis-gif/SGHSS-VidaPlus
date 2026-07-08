@@ -39,6 +39,13 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body,
+#root {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   color: var(--text);
@@ -480,6 +487,7 @@ code {
 .workspace-shell {
   display: grid;
   grid-template-columns: 296px minmax(0, 1fr);
+  min-width: 0;
 }
 
 .sidebar {
@@ -572,7 +580,9 @@ code {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+  min-width: 0;
   padding-inline: clamp(1rem, 2vw, 2rem);
+  overflow-x: hidden;
 }
 
 .topbar {
@@ -619,6 +629,7 @@ code {
 .topbar__identity {
   flex-direction: column;
   gap: 0.15rem;
+  min-width: 0;
   max-width: 31rem;
 }
 
@@ -2112,6 +2123,30 @@ textarea {
 
 .topbar__menu-button {
   display: none;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: 16px;
+}
+
+.topbar__menu-icon {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 18px;
+  height: 18px;
+}
+
+.topbar__menu-icon span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--text-strong);
 }
 
 .rating-chip {
@@ -2323,25 +2358,53 @@ textarea {
     padding: 1.2rem;
   }
 
+  .workspace-shell,
+  .main-shell,
+  .page-shell,
+  .page-grid,
+  .content-grid,
+  .metric-grid,
+  .card-grid,
+  .section-intro,
+  .panel,
+  .record-card,
+  .metric-card,
+  .notification-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .topbar,
   .section-intro {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .topbar {
+    gap: 0.85rem;
+    padding: 0.9rem;
+    border-radius: 26px;
+  }
+
   .topbar__heading {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     width: 100%;
-    flex-wrap: wrap;
-    align-items: flex-start;
+    min-width: 0;
+    align-items: start;
+    gap: 0.85rem;
   }
 
   .topbar__heading--workspace {
-    gap: 0.85rem;
+    width: 100%;
   }
 
   .topbar__menu-button {
     flex: 0 0 auto;
-    align-self: flex-start;
+    align-self: start;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
   }
 
   .topbar__controls {
@@ -2350,9 +2413,11 @@ textarea {
 
   .topbar__controls--workspace {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) auto;
     gap: 0.75rem;
     width: 100%;
+    min-width: 0;
+    align-items: start;
   }
 
   .topbar--workspace {
@@ -2360,8 +2425,23 @@ textarea {
     border-radius: 24px;
   }
 
-  .topbar--workspace .topbar__identity p {
+  .topbar__identity {
+    min-width: 0;
     max-width: none;
+  }
+
+  .topbar--workspace .topbar__identity strong,
+  .topbar__identity strong {
+    font-size: 1rem;
+    line-height: 1.08;
+  }
+
+  .topbar--workspace .topbar__identity p {
+    display: none;
+  }
+
+  .topbar__controls--workspace > * {
+    min-width: 0;
   }
 
   .page-shell {
@@ -2390,12 +2470,29 @@ textarea {
     flex: 1 1 auto;
   }
 
+  .search-field--compact {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .topbar__unit-filter {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
   .topbar__menu-group {
     width: auto;
     min-width: 0;
     flex: 0 0 auto;
-    justify-content: flex-start;
-    align-self: flex-end;
+    grid-column: 2;
+    grid-row: 1;
+    justify-content: flex-end;
+    justify-self: end;
+    align-self: start;
+  }
+
+  .topbar__dropdown {
+    width: min(300px, calc(100vw - 2.2rem));
   }
 
   .page-grid--management .section-intro__title,
@@ -2443,7 +2540,13 @@ textarea {
 
   .section-intro__title {
     max-width: none;
-    font-size: clamp(2rem, 8vw, 2.8rem);
+    font-size: clamp(1.95rem, 8.5vw, 2.55rem);
+    line-height: 1.04;
+  }
+
+  .section-intro__description {
+    max-width: none;
+    font-size: 0.98rem;
   }
 
   .table-wrapper {
