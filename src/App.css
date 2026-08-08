@@ -700,128 +700,6 @@ code {
   flex: 0 1 250px;
 }
 
-.topbar__menu-group {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-.topbar__dropdown-trigger {
-  width: 52px;
-  height: 52px;
-  display: inline-grid;
-  place-items: center;
-  padding: 0;
-  border-radius: 16px;
-  border-color: rgba(18, 118, 136, 0.15);
-  background: rgba(255, 255, 255, 0.86);
-}
-
-.topbar__menu-group.is-open .topbar__dropdown-trigger {
-  background: linear-gradient(135deg, rgba(11, 141, 164, 0.16), rgba(25, 186, 172, 0.18));
-  box-shadow: 0 14px 28px rgba(11, 42, 55, 0.08);
-}
-
-.topbar__launcher-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
-  width: 18px;
-  height: 18px;
-}
-
-.topbar__launcher-dot {
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(20, 74, 93, 0.78);
-  transition:
-    transform 0.18s ease,
-    background 0.18s ease,
-    opacity 0.18s ease;
-}
-
-.topbar__dropdown-trigger:hover .topbar__launcher-dot,
-.topbar__menu-group.is-open .topbar__launcher-dot {
-  background: var(--primary);
-}
-
-.topbar__dropdown-trigger:hover .topbar__launcher-dot:nth-child(5),
-.topbar__menu-group.is-open .topbar__launcher-dot:nth-child(5) {
-  transform: scale(1.28);
-}
-
-.topbar__dropdown {
-  position: absolute;
-  top: calc(100% + 0.7rem);
-  right: 0;
-  z-index: 40;
-  width: min(320px, calc(100vw - 2.5rem));
-  padding: 0.85rem;
-  border: 1px solid rgba(18, 118, 136, 0.14);
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 252, 0.96));
-  box-shadow: 0 24px 50px rgba(11, 42, 55, 0.14);
-  backdrop-filter: blur(20px);
-}
-
-.topbar__dropdown-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.1rem 0.1rem 0.75rem;
-  border-bottom: 1px solid rgba(18, 118, 136, 0.1);
-}
-
-.topbar__dropdown-header p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.84rem;
-}
-
-.topbar__dropdown-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 0.75rem;
-}
-
-.topbar__dropdown-item {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
-  padding: 0.82rem 0.9rem;
-  border-radius: 18px;
-  border: 1px solid rgba(18, 118, 136, 0.1);
-  background: rgba(248, 251, 253, 0.96);
-  text-align: left;
-}
-
-.topbar__dropdown-item strong {
-  font-size: 0.95rem;
-}
-
-.topbar__dropdown-item span {
-  color: var(--muted);
-  font-size: 0.84rem;
-}
-
-.topbar__dropdown-item.is-active {
-  border-color: rgba(25, 186, 172, 0.28);
-  background: linear-gradient(135deg, rgba(11, 141, 164, 0.14), rgba(25, 186, 172, 0.1));
-}
-
-.topbar__dropdown-item--danger {
-  margin-top: 0.75rem;
-  border-color: rgba(182, 87, 87, 0.12);
-  background: rgba(255, 249, 249, 0.98);
-}
-
-.topbar__dropdown-item--danger strong {
-  color: #9b4d4d;
-}
-
 .page-shell,
 .auth-form-stack {
   width: min(100%, 1440px);
@@ -2302,26 +2180,10 @@ textarea {
   }
 
   .search-field--compact,
-  .topbar__unit-filter,
-  .topbar__menu-group {
+  .topbar__unit-filter {
     width: 100%;
     min-width: 0;
     flex: 1 1 100%;
-  }
-
-  .topbar__menu-group {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .topbar__dropdown-trigger {
-    width: 52px;
-  }
-
-  .topbar__dropdown {
-    width: min(320px, calc(100vw - 2.5rem));
-    left: auto;
-    right: 0;
   }
 
   .auth-role-header,
@@ -2487,21 +2349,6 @@ textarea {
     grid-row: 2;
   }
 
-  .topbar__menu-group {
-    width: auto;
-    min-width: 0;
-    flex: 0 0 auto;
-    grid-column: 2;
-    grid-row: 1;
-    justify-content: flex-end;
-    justify-self: end;
-    align-self: start;
-  }
-
-  .topbar__dropdown {
-    width: min(300px, calc(100vw - 2.2rem));
-  }
-
   .page-grid--management .section-intro__title,
   .section-intro--compact .section-intro__title {
     max-width: none;
@@ -2641,4 +2488,891 @@ textarea {
     animation: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* VidaPlus Brand Kit 2.0 */
+:root {
+  --bg-0: #f7fbff;
+  --bg-1: #f2f4f7;
+  --bg-2: #eaf8fa;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --surface-dark: #0b4e92;
+  --surface-darker: #082e6b;
+  --line: #e1e7ee;
+  --line-strong: #cbd5e1;
+  --text: #263238;
+  --text-strong: #102a56;
+  --muted: #667085;
+  --muted-soft: #8a98aa;
+  --primary: #1e4fa3;
+  --primary-2: #00b8c9;
+  --primary-soft: rgba(30, 79, 163, 0.1);
+  --accent: #00b8c9;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --info: #1e4fa3;
+  --sidebar-text: #ffffff;
+  --shadow-soft: 0 4px 16px rgba(38, 50, 56, 0.08);
+  --shadow-panel: 0 8px 24px rgba(30, 79, 163, 0.09);
+  --shadow-strong: 0 16px 40px rgba(8, 46, 107, 0.2);
+  --radius-xs: 8px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+body {
+  color: var(--text);
+  background-color: var(--bg-1);
+  background-image: url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+body::before,
+body::after {
+  display: none;
+}
+
+h1,
+h2,
+h3,
+strong {
+  color: var(--text-strong);
+  font-family: Poppins, Inter, sans-serif;
+  letter-spacing: 0;
+}
+
+p,
+span,
+label,
+button,
+input,
+select,
+textarea,
+table {
+  letter-spacing: 0;
+}
+
+.auth-shell--brand {
+  display: grid;
+  grid-template-columns: minmax(380px, 480px) minmax(0, 1fr);
+  width: 100%;
+  max-width: none;
+  min-height: 100dvh;
+  margin: 0;
+  padding: 0;
+  gap: 0;
+  background: #ffffff;
+}
+
+.auth-card--brand,
+.auth-hero--brand {
+  min-height: 100dvh;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.auth-card--brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  overflow-y: auto;
+  color: #ffffff;
+  background-color: #0b4e92;
+  background-image: url('/brand/backgrounds/Desktop_2560x1440/05_gradiente_marca.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.auth-card--brand::before,
+.auth-card--brand::after {
+  display: none;
+}
+
+.auth-card__logo {
+  width: min(100%, 230px);
+  height: auto;
+  align-self: flex-start;
+}
+
+.auth-card--brand .auth-form-stack {
+  width: 100%;
+  max-width: 390px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.auth-card--brand .auth-login-form > * {
+  grid-column: 1 / -1;
+}
+
+.auth-card--brand .auth-login-kicker,
+.auth-card--brand .auth-login-copy,
+.auth-card--brand .auth-role-header span,
+.auth-card--brand .auth-role-caption,
+.auth-card--brand .hint-text,
+.auth-card--brand .checkbox,
+.auth-card--brand .text-link,
+.auth-card--brand .form-field > span,
+.auth-card--brand .section-intro__eyebrow,
+.auth-card--brand .section-intro__description,
+.auth-card--brand p,
+.auth-card--brand li {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.auth-card--brand h1,
+.auth-card--brand h2,
+.auth-card--brand h3,
+.auth-card--brand strong {
+  color: #ffffff;
+}
+
+.auth-login-header {
+  gap: 0.45rem;
+}
+
+.auth-login-kicker {
+  display: none;
+}
+
+.auth-login-title {
+  max-width: 360px;
+  font-size: clamp(1.65rem, 3vw, 2.15rem);
+  line-height: 1.2;
+}
+
+.auth-login-copy {
+  font-size: 0.94rem;
+}
+
+.auth-card--brand .form-grid {
+  gap: 0.62rem;
+}
+
+.auth-card--brand input,
+.auth-card--brand select,
+.auth-card--brand textarea {
+  min-height: 42px;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 8px;
+  background: rgba(4, 43, 99, 0.22);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.auth-card--brand input::placeholder {
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.auth-card--brand input:focus,
+.auth-card--brand select:focus,
+.auth-card--brand textarea:focus {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+}
+
+.auth-card--brand select option {
+  color: var(--text);
+}
+
+.auth-card--brand .auth-role-header {
+  margin-top: 0.2rem;
+}
+
+.auth-card--brand .auth-role-header span,
+.auth-card--brand .auth-role-caption {
+  display: none;
+}
+
+.auth-card--brand .auth-support-strip {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.auth-card--brand code {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.auth-card--brand .button--primary {
+  min-height: 46px;
+  background: #083f91;
+  border-color: #083f91;
+  box-shadow: 0 8px 20px rgba(5, 32, 89, 0.24);
+}
+
+.auth-card--brand .button--primary:hover {
+  background: #062f72;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.button--certificate {
+  width: 100%;
+  min-height: 46px;
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 8px;
+  background: transparent;
+}
+
+.button--certificate:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-card--brand .auth-link-row {
+  justify-content: center;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.8rem 1.1rem;
+}
+
+.auth-card--brand .text-link {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-hero--brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  padding: clamp(2rem, 6vw, 6rem);
+  overflow: hidden;
+  background-color: #ffffff;
+  background-image:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(242, 250, 252, 0.9)),
+    url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.auth-hero--brand::before,
+.auth-hero--brand::after {
+  display: none;
+}
+
+.auth-hero__logo {
+  width: min(72%, 560px);
+  height: auto;
+}
+
+.auth-hero__message {
+  max-width: 620px;
+  text-align: center;
+}
+
+.auth-hero__message > span {
+  color: var(--primary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.auth-hero__message h2 {
+  margin-top: 0.8rem;
+  color: var(--primary);
+  font-size: clamp(2rem, 4vw, 3.35rem);
+  line-height: 1.12;
+}
+
+.auth-hero__message h2 em {
+  color: #12a86f;
+  font-style: normal;
+}
+
+.auth-hero__message p {
+  max-width: 540px;
+  margin: 1rem auto 0;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.workspace-shell {
+  grid-template-columns: 232px minmax(0, 1fr);
+  min-height: 100dvh;
+  background: rgba(242, 244, 247, 0.82);
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 30;
+  width: 232px;
+  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  align-self: start;
+  overflow: hidden;
+  padding: 1.25rem 0.9rem;
+  gap: 1.25rem;
+  color: #ffffff;
+  background-color: #0b4e92;
+  background-image: url('/brand/backgrounds/Desktop_2560x1440/06_gradiente_menu_lateral.png');
+  background-size: cover;
+  background-position: center;
+  box-shadow: 2px 0 12px rgba(8, 46, 107, 0.16);
+}
+
+.sidebar__brand {
+  gap: 0.7rem;
+  padding: 0.2rem 0.55rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.sidebar__logo {
+  width: 100%;
+  max-width: 176px;
+  height: auto;
+}
+
+.sidebar__profile {
+  width: fit-content;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.67rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.sidebar__nav {
+  flex: 1 1 auto;
+  min-height: 0;
+  gap: 0.25rem;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.sidebar__nav::-webkit-scrollbar {
+  display: none;
+}
+
+.sidebar__item {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 0.72rem;
+  min-height: 42px;
+  padding: 0.58rem 0.72rem;
+  border: 0;
+  border-radius: 8px;
+  color: rgba(255, 255, 255, 0.88);
+  background: transparent;
+  box-shadow: none;
+}
+
+.sidebar__item::before {
+  display: none;
+}
+
+.sidebar__item:hover,
+.sidebar__item.is-active {
+  transform: none;
+  border-color: transparent;
+  color: #ffffff;
+  background: rgba(0, 184, 201, 0.82);
+}
+
+.sidebar__item-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.92;
+}
+
+.sidebar__item .sidebar__item-copy {
+  display: block;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.sidebar__item:hover .sidebar__item-copy,
+.sidebar__item.is-active .sidebar__item-copy {
+  color: #ffffff;
+}
+
+.sidebar__item strong {
+  display: block;
+  padding: 0;
+  color: inherit;
+  font-family: Inter, Arial, sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.sidebar__item small {
+  display: none;
+}
+
+.sidebar__logout {
+  flex: 0 0 auto;
+  width: 100%;
+  min-height: 40px;
+  margin-top: auto;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: #ffffff;
+  background: rgba(4, 35, 82, 0.2);
+  text-align: left;
+  font-weight: 600;
+}
+
+.sidebar__logout:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-backdrop {
+  z-index: 25;
+}
+
+.main-shell {
+  grid-column: 2;
+  gap: 1rem;
+  padding: 0 1.5rem 2.25rem;
+  background-color: rgba(242, 244, 247, 0.86);
+  background-image: url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.topbar {
+  min-height: 70px;
+  margin: 0 -1.5rem;
+  padding: 0.75rem 1.5rem;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 10px rgba(38, 50, 56, 0.05);
+}
+
+.topbar__identity {
+  gap: 0.05rem;
+  max-width: 260px;
+}
+
+.topbar__identity strong {
+  color: var(--text-strong);
+  font-size: 0.98rem;
+}
+
+.topbar__identity p {
+  display: none;
+}
+
+.topbar__controls--workspace {
+  align-items: center;
+}
+
+.search-field {
+  position: relative;
+}
+
+.search-field::before,
+.search-field::after {
+  display: none;
+}
+
+.search-field__icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  opacity: 0.62;
+}
+
+.search-field input {
+  min-height: 42px;
+  padding-left: 2.65rem;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.page-shell {
+  padding: 0.25rem 0 2rem;
+}
+
+.page-grid {
+  gap: 1rem;
+}
+
+.section-intro {
+  align-items: flex-end;
+  gap: 1.25rem;
+  padding: 0.5rem 0 0.2rem;
+}
+
+.section-intro__eyebrow {
+  color: var(--primary);
+  font-size: 0.7rem;
+  letter-spacing: 0;
+}
+
+.section-intro__title,
+.page-grid--management .section-intro__title,
+.section-intro--compact .section-intro__title {
+  max-width: 760px;
+  color: var(--text-strong);
+  font-size: clamp(1.65rem, 2.5vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.section-intro__description {
+  max-width: 720px;
+  margin-top: 0.35rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.metric-grid,
+.content-grid,
+.card-grid {
+  gap: 1rem;
+}
+
+.panel,
+.metric-card,
+.record-card,
+.notification-card,
+.empty-state,
+.auth-feature-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.panel::before,
+.metric-card::before,
+.record-card::before,
+.notification-card::before,
+.empty-state::before,
+.auth-feature-card::before {
+  display: none;
+}
+
+.panel,
+.metric-card {
+  padding: 1.15rem;
+}
+
+.panel:hover,
+.metric-card:hover,
+.record-card:hover,
+.notification-card:hover,
+.empty-state:hover {
+  transform: none;
+}
+
+.metric-card {
+  min-height: 124px;
+  justify-content: space-between;
+  border-top: 3px solid var(--primary);
+}
+
+.metric-card--accent {
+  border-top-color: var(--accent);
+}
+
+.metric-card--success {
+  border-top-color: var(--success);
+}
+
+.metric-card--warning {
+  border-top-color: var(--warning);
+}
+
+.metric-card__label {
+  width: auto;
+  padding: 0;
+  border-radius: 0;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.72rem;
+}
+
+.metric-card__value {
+  color: var(--primary);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.metric-card__detail {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.panel--accent,
+.panel--editor-secondary {
+  border-color: rgba(0, 184, 201, 0.2);
+  background: linear-gradient(135deg, #f7fbff, #eaf8fa);
+}
+
+.record-card,
+.notification-card {
+  padding: 0.9rem 1rem;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.button {
+  min-height: 40px;
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+.button--primary {
+  border-color: var(--primary);
+  background: var(--primary);
+}
+
+.button--primary:hover {
+  border-color: #173f83;
+  background: #173f83;
+  transform: none;
+}
+
+.button--ghost {
+  color: var(--primary);
+  border-color: #cfd9e6;
+  background: #ffffff;
+}
+
+.button--danger {
+  background: var(--error);
+}
+
+input,
+select,
+textarea {
+  min-height: 42px;
+  border-color: #cfd9e6;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(30, 79, 163, 0.1);
+}
+
+.badge,
+.status-pill {
+  box-shadow: none;
+}
+
+.table-wrapper {
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.data-table thead th {
+  background: #f2f4f7;
+  color: var(--primary);
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.78rem 0.9rem;
+}
+
+.panel--editor,
+.page-grid--management .content-grid--form-aside > :first-child {
+  top: 5.6rem;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow-soft);
+}
+
+.video-stage__window {
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(8, 46, 107, 0.08), rgba(8, 46, 107, 0.78)),
+    url('/brand/backgrounds/Desktop_2560x1440/03_gradiente_suave_azul_turquesa.png');
+  background-size: cover;
+}
+
+.tele-session-layout {
+  gap: 1rem;
+}
+
+.toast,
+.modal-card {
+  border-radius: 12px;
+}
+
+@media (max-width: 1100px) {
+  .auth-shell--brand {
+    grid-template-columns: minmax(360px, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .workspace-shell {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 100dvh;
+  }
+
+  .sidebar {
+    width: min(84vw, 280px);
+    min-height: 100vh;
+    height: 100dvh;
+    padding: 1.25rem 0.9rem;
+  }
+
+  .main-shell {
+    grid-column: 1;
+    padding-inline: 1.25rem;
+  }
+
+  .topbar {
+    margin-inline: -1.25rem;
+    padding-inline: 1.25rem;
+  }
+}
+
+@media (max-width: 760px) {
+  body {
+    background-image: url('/brand/backgrounds/Mobile_1440x2560/04_padrao_medico_ondas.png');
+  }
+
+  .auth-shell--brand {
+    display: block;
+    min-height: 100dvh;
+  }
+
+  .auth-card--brand {
+    min-height: 100dvh;
+    padding: 2rem 1.35rem;
+    background-image: url('/brand/backgrounds/Mobile_1440x2560/05_gradiente_marca.png');
+  }
+
+  .auth-card__logo {
+    width: 220px;
+  }
+
+  .auth-card--brand .auth-form-stack {
+    max-width: none;
+  }
+
+  .auth-hero--brand {
+    display: none;
+  }
+
+  .main-shell {
+    padding: 0 1rem 1.5rem;
+  }
+
+  .topbar {
+    min-height: 64px;
+    margin: 0 -1rem;
+    padding: 0.7rem 1rem;
+    border-radius: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .topbar__heading {
+    display: block;
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .topbar__identity {
+    display: none;
+  }
+
+  .topbar__controls--workspace {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+  }
+
+  .search-field--compact {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .topbar__unit-filter {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .page-shell {
+    padding-top: 0.25rem;
+  }
+
+  .section-intro {
+    align-items: stretch;
+  }
+
+  .section-intro__title,
+  .page-grid--management .section-intro__title,
+  .section-intro--compact .section-intro__title {
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  .metric-grid,
+  .content-grid,
+  .card-grid,
+  .tele-session-layout,
+  .video-stage__screen {
+    grid-template-columns: 1fr;
+  }
+
+  .panel,
+  .metric-card {
+    padding: 1rem;
+  }
+
 }

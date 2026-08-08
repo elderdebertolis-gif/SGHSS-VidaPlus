@@ -1,4 +1,4 @@
-import { startTransition, useDeferredValue, useEffect, useRef, useState } from 'react'
+import { startTransition, useDeferredValue, useEffect, useState } from 'react'
 import type { FormEvent, ReactNode } from 'react'
 import './App.css'
 import {
@@ -140,6 +140,37 @@ const roleLogins: Record<Profile, string> = {
   patient: 'maria.oliveira',
   professional: 'dra.helena',
   admin: 'fernanda.nunes',
+}
+
+const menuIconPaths: Record<string, string> = {
+  dashboard: 'dashboard',
+  profile: 'perfil',
+  consultations: 'agenda',
+  exams: 'exames',
+  history: 'prontuario',
+  telemedicine: 'telemedicina',
+  prescriptions: 'receitas',
+  notifications: 'notificacoes',
+  privacy: 'seguranca',
+  agenda: 'agenda',
+  patients: 'paciente',
+  records: 'prontuario',
+  examRequests: 'exames',
+  homecare: 'leito',
+  professionals: 'paciente',
+  units: 'configuracoes',
+  admissions: 'leito',
+  beds: 'leito',
+  supplies: 'exames',
+  finance: 'financeiro',
+  indicators: 'relatorios',
+  security: 'seguranca',
+  permissions: 'configuracoes',
+}
+
+function menuIconPath(key: string) {
+  const icon = menuIconPaths[key] ?? 'dashboard'
+  return `/brand/icons/Vetorial_SVG/${icon}.svg`
 }
 
 function formatMoney(value: number) {
@@ -364,9 +395,6 @@ function App() {
   const [globalSearch, setGlobalSearch] = useState('')
   const deferredSearch = useDeferredValue(globalSearch.trim().toLowerCase())
   const [unitFilter, setUnitFilter] = useState('Todas as unidades')
-  const [quickMenuOpen, setQuickMenuOpen] = useState(false)
-  const quickMenuRef = useRef<HTMLDivElement | null>(null)
-
   const [loginForm, setLoginForm] = useState({
     username: 'maria.oliveira@vidaplus.demo',
     password: '',
@@ -550,60 +578,12 @@ function App() {
     }
   }, [feedback])
 
-  useEffect(() => {
-    if (!quickMenuOpen) {
-      return undefined
-    }
-
-    function handlePointerDown(event: PointerEvent) {
-      if (!quickMenuRef.current?.contains(event.target as Node)) {
-        setQuickMenuOpen(false)
-      }
-    }
-
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setQuickMenuOpen(false)
-      }
-    }
-
-    window.addEventListener('pointerdown', handlePointerDown)
-    window.addEventListener('keydown', handleKeyDown)
-
-    return () => {
-      window.removeEventListener('pointerdown', handlePointerDown)
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [quickMenuOpen])
-
   const activeProfile = sessionProfile ?? loginForm.profile
   const activeMenu = profileMenus[activeProfile]
   const activeMeta = profileMeta[activeProfile]
   const isPatientSession = sessionProfile === 'patient'
   const isProfessionalSession = sessionProfile === 'professional'
   const isAdminSession = sessionProfile === 'admin'
-  const quickMenuConfig: Record<Profile, { keys: string[]; title: string; description: string }> = {
-    patient: {
-      keys: ['profile', 'prescriptions', 'notifications', 'privacy'],
-      title: 'Conta do paciente',
-      description: 'Acessos de apoio, cadastro, notificações e privacidade.',
-    },
-    professional: {
-      keys: ['prescriptions', 'examRequests', 'homecare', 'history'],
-      title: 'Atalhos do profissional',
-      description: 'Módulos clínicos complementares da rotina assistencial.',
-    },
-    admin: {
-      keys: ['supplies', 'finance', 'indicators', 'security', 'permissions'],
-      title: 'Atalhos administrativos',
-      description: 'Módulos secundários e configurações de acesso.',
-    },
-  }
-  const activeQuickMenuConfig = quickMenuConfig[activeProfile]
-  const quickMenuItems = activeMenu.filter((item) => activeQuickMenuConfig.keys.includes(item.key))
-  const visibleSidebarMenu = activeMenu.filter(
-    (item) => !activeQuickMenuConfig.keys.includes(item.key),
-  )
   const unreadNotifications = notifications.filter((item) => !item.read).length
   const unitOptions = units.map((item) => item.name)
   const timelineProfessionalOptions = [
@@ -927,12 +907,6 @@ function App() {
     setFeedback({ tone, message })
   }
 
-  function sessionUserName(profile: Profile) {
-    if (profile === 'patient') return patientProfile.name
-    if (profile === 'professional') return professionalDemoUser
-    return adminDemoUser
-  }
-
   function appendAuditLog(profile: Profile, action: string, module: string, status = 'Sucesso') {
     const stamp = buildNowTimestamp()
     const entry: AuditLog = {
@@ -986,7 +960,6 @@ function App() {
     startTransition(() => {
       setCurrentView(nextView)
       setMobileMenuOpen(false)
-      setQuickMenuOpen(false)
     })
   }
 
@@ -995,7 +968,6 @@ function App() {
     setAuthView('login')
     setCurrentView('dashboard')
     setMobileMenuOpen(false)
-    setQuickMenuOpen(false)
     setGlobalSearch('')
     setUnitFilter('Todas as unidades')
     setLoginForm((current) => ({ ...current, password: '' }))
@@ -2207,9 +2179,9 @@ function App() {
       <div className="auth-form-stack">
         <div className="auth-login-header">
           <span className="auth-login-kicker">Acesso SGHSS VidaPlus</span>
-          <h1 className="auth-login-title">Entrar</h1>
+          <h1 className="auth-login-title">Bem-vindo(a) de volta!</h1>
           <p className="auth-login-copy">
-            Use o ambiente de demonstração e escolha o perfil com o qual deseja navegar.
+            Acesse sua conta para continuar.
           </p>
         </div>
         <form className="form-grid auth-login-form" onSubmit={handleLoginSubmit}>
@@ -2217,6 +2189,7 @@ function App() {
             <span>E-mail, CPF ou usuário</span>
             <input
               value={loginForm.username}
+              placeholder="E-mail, CPF ou usuário"
               onChange={(event) =>
                 setLoginForm((current) => ({ ...current, username: event.target.value }))
               }
@@ -2228,6 +2201,7 @@ function App() {
             <input
               type="password"
               value={loginForm.password}
+              placeholder="Digite sua senha"
               onChange={(event) =>
                 setLoginForm((current) => ({ ...current, password: event.target.value }))
               }
@@ -2283,6 +2257,14 @@ function App() {
               Entrar
             </button>
           </div>
+          <div className="auth-divider"><span>ou</span></div>
+          <button
+            className="button button--certificate"
+            type="button"
+            onClick={() => showFeedback('info', 'Acesso por certificado digital representado no protótipo.')}
+          >
+            Entrar com certificado digital
+          </button>
           <div className="link-row auth-link-row auth-link-row--compact">
             <button type="button" className="text-link" onClick={() => setAuthView('register')}>
               Primeiro acesso
@@ -2678,7 +2660,7 @@ function App() {
       )
     }
 
-    return <div className="page-grid"><SectionIntro eyebrow="Dashboard do paciente" title="Visão geral da jornada assistencial" description="Resumo de próximas consultas, exames, prescrições, notificações e atalhos de autoatendimento." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('consultations')}>Nova consulta</button><button className="button button--ghost" type="button" onClick={() => navigate('telemedicine')}>Entrar na teleconsulta</button></div>} /><div className="metric-grid"><MetricCard label="Próximas consultas" value={`${upcomingAppointments.length}`} detail="Inclui presencial e telemedicina" tone="accent" /><MetricCard label="Exames pendentes" value={`${pendingExams}`} detail="Com preparo visível e alertas" tone="warning" /><MetricCard label="Prescrições ativas" value={`${prescriptions.filter((item) => item.status === 'Ativa').length}`} detail="Receitas digitais simuladas" tone="success" /><MetricCard label="Notificações não lidas" value={`${unreadNotifications}`} detail="Lembretes e confirmações" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Próxima interação</h2><p className="lead-text">{upcomingAppointments[0].specialty} em {formatDate(upcomingAppointments[0].date)} as {upcomingAppointments[0].time}.</p><p>{upcomingAppointments[0].guidance}</p><div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('history')}>Ver histórico</button><button className="button button--ghost" type="button" onClick={() => navigate('profile')}>Atualizar cadastro</button></div></Panel><Panel><h2>Lembretes do dia</h2><div className="stack-list">{notifications.slice(0, 3).map((item) => (<article key={item.id} className="notification-card"><div className="record-card__header"><strong>{item.title}</strong><span className={`badge badge--${item.tone}`}>{item.time}</span></div><p>{item.message}</p></article>))}</div></Panel></div><div className="content-grid content-grid--wide"><Panel><h2>Agenda e exames</h2><div className="stack-list">{appointments.slice(0, 2).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.specialty}</strong><StatusBadge status={item.status} /></div><p>{formatDate(item.date)} - {item.time} - {item.unit}</p></article>))}{exams.slice(0, 1).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.type}</strong><StatusBadge status={item.status} /></div><p>{item.preparation}</p></article>))}</div></Panel><Panel><h2>Histórico recente</h2><div className="timeline">{timeline.slice(0, 3).map((item) => (<article key={item.id} className="timeline-item"><div className="timeline-item__marker" /><div className="timeline-item__content"><strong>{item.title}</strong><p>{formatDate(item.date)} - {item.professional}</p></div></article>))}</div></Panel></div></div>
+    return <div className="page-grid"><SectionIntro eyebrow="Dashboard do paciente" title={`Olá, ${patientProfile.name.split(' ')[0]}!`} description="Aqui está um resumo da sua saúde hoje." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('consultations')}>Nova consulta</button><button className="button button--ghost" type="button" onClick={() => navigate('telemedicine')}>Entrar na teleconsulta</button></div>} /><div className="metric-grid"><MetricCard label="Próximas consultas" value={`${upcomingAppointments.length}`} detail="Inclui presencial e telemedicina" tone="accent" /><MetricCard label="Exames pendentes" value={`${pendingExams}`} detail="Com preparo visível e alertas" tone="warning" /><MetricCard label="Prescrições ativas" value={`${prescriptions.filter((item) => item.status === 'Ativa').length}`} detail="Receitas digitais simuladas" tone="success" /><MetricCard label="Notificações não lidas" value={`${unreadNotifications}`} detail="Lembretes e confirmações" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Próxima interação</h2><p className="lead-text">{upcomingAppointments[0].specialty} em {formatDate(upcomingAppointments[0].date)} as {upcomingAppointments[0].time}.</p><p>{upcomingAppointments[0].guidance}</p><div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('history')}>Ver histórico</button><button className="button button--ghost" type="button" onClick={() => navigate('profile')}>Atualizar cadastro</button></div></Panel><Panel><h2>Lembretes do dia</h2><div className="stack-list">{notifications.slice(0, 3).map((item) => (<article key={item.id} className="notification-card"><div className="record-card__header"><strong>{item.title}</strong><span className={`badge badge--${item.tone}`}>{item.time}</span></div><p>{item.message}</p></article>))}</div></Panel></div><div className="content-grid content-grid--wide"><Panel><h2>Agenda e exames</h2><div className="stack-list">{appointments.slice(0, 2).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.specialty}</strong><StatusBadge status={item.status} /></div><p>{formatDate(item.date)} - {item.time} - {item.unit}</p></article>))}{exams.slice(0, 1).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.type}</strong><StatusBadge status={item.status} /></div><p>{item.preparation}</p></article>))}</div></Panel><Panel><h2>Histórico recente</h2><div className="timeline">{timeline.slice(0, 3).map((item) => (<article key={item.id} className="timeline-item"><div className="timeline-item__marker" /><div className="timeline-item__content"><strong>{item.title}</strong><p>{formatDate(item.date)} - {item.professional}</p></div></article>))}</div></Panel></div></div>
   }
 
   function renderProfessionalView() {
@@ -2989,7 +2971,7 @@ function App() {
       return <div className="page-grid"><SectionIntro eyebrow="Histórico do profissional" title="Atendimentos concluídos e produtividade" description="Visão rápida da carga assistencial e dos atendimentos finalizados." /><div className="metric-grid"><MetricCard label="Concluídos hoje" value={`${agenda.filter((item) => item.status === 'Concluído').length}`} detail="Atendimentos finalizados" tone="success" /><MetricCard label="Em atendimento" value={`${agenda.filter((item) => item.status === 'Em atendimento').length}`} detail="Pacientes no fluxo clínico" tone="accent" /><MetricCard label="Telemedicina" value={`${agenda.filter((item) => item.type === 'Telemedicina').length}`} detail="Consultas online do dia" /><MetricCard label="Home care" value={`${homeCareVisits.length}`} detail="Pacientes em rota domiciliar" tone="warning" /></div><Panel><div className="stack-list">{agenda.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.patientName}</strong><StatusBadge status={item.status} /></div><p>{item.type} - {item.reason} - {item.time}</p></article>))}</div></Panel></div>
     }
 
-    return <div className="page-grid"><SectionIntro eyebrow="Dashboard do profissional" title="Rotina assistencial do dia" description="Agenda diária, telemedicina, pendências clínicas e pacientes com prioridade." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('agenda')}>Abrir agenda</button><button className="button button--ghost" type="button" onClick={() => navigate('telemedicine')}>Acessar telemedicina</button></div>} /><div className="metric-grid"><MetricCard label="Atendimentos do dia" value={`${agenda.length}`} detail="Presencial, online e home care" tone="accent" /><MetricCard label="Pendentes" value={`${agenda.filter((item) => item.status === 'Agendado' || item.status === 'Confirmado').length}`} detail="Com acesso rápido ao prontuário" /><MetricCard label="Pacientes de alto risco" value={`${homeCareVisits.filter((item) => item.risk === 'Alta').length}`} detail="Monitoramento prioritário" tone="warning" /><MetricCard label="Teleconsultas" value={`${agenda.filter((item) => item.type === 'Telemedicina').length}`} detail="Janela segura de atendimento" tone="success" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Próximo paciente</h2><p className="lead-text">{agenda[0].patientName} " {agenda[0].time}</p><p>{agenda[0].reason}</p><button className="button button--primary" type="button" onClick={() => { setSelectedProfessionalPatientId(agenda[0].patientId); navigate('records') }}>Abrir prontuário</button></Panel><Panel><h2>Alertas assistenciais</h2><div className="stack-list">{agenda.slice(0, 3).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.patientName}</strong><StatusBadge status={item.type} /></div><p>{item.alert}</p></article>))}</div></Panel></div></div>
+    return <div className="page-grid"><SectionIntro eyebrow="Dashboard do profissional" title={`Olá, ${professionalDemoUser}!`} description="Confira a agenda, as pendências clínicas e os pacientes prioritários de hoje." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('agenda')}>Abrir agenda</button><button className="button button--ghost" type="button" onClick={() => navigate('telemedicine')}>Acessar telemedicina</button></div>} /><div className="metric-grid"><MetricCard label="Atendimentos do dia" value={`${agenda.length}`} detail="Presencial, online e home care" tone="accent" /><MetricCard label="Pendentes" value={`${agenda.filter((item) => item.status === 'Agendado' || item.status === 'Confirmado').length}`} detail="Com acesso rápido ao prontuário" /><MetricCard label="Pacientes de alto risco" value={`${homeCareVisits.filter((item) => item.risk === 'Alta').length}`} detail="Monitoramento prioritário" tone="warning" /><MetricCard label="Teleconsultas" value={`${agenda.filter((item) => item.type === 'Telemedicina').length}`} detail="Janela segura de atendimento" tone="success" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Próximo paciente</h2><p className="lead-text">{agenda[0].patientName} " {agenda[0].time}</p><p>{agenda[0].reason}</p><button className="button button--primary" type="button" onClick={() => { setSelectedProfessionalPatientId(agenda[0].patientId); navigate('records') }}>Abrir prontuário</button></Panel><Panel><h2>Alertas assistenciais</h2><div className="stack-list">{agenda.slice(0, 3).map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.patientName}</strong><StatusBadge status={item.type} /></div><p>{item.alert}</p></article>))}</div></Panel></div></div>
   }
 
   function renderAdminView() {
@@ -4060,7 +4042,7 @@ function App() {
       )
     }
 
-    return <div className="page-grid"><SectionIntro eyebrow="Dashboard administrativo" title="Visão institucional da operação VidaPlus" description="Indicadores, disponibilidade, leitos, estoque crítico e múltiplas unidades em um único painel." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('security')}>Abrir auditoria</button><button className="button button--ghost" type="button" onClick={() => navigate('beds')}>Ver leitos</button></div>} /><div className="metric-grid"><MetricCard label="Disponibilidade" value={availabilitySnapshot.availability} detail="Meta institucional representada em tela" tone="success" /><MetricCard label="Último backup" value={availabilitySnapshot.backup} detail="Rastreabilidade visual do protótipo" /><MetricCard label="Leitos ocupados" value={`${occupiedBeds}`} detail="Com controle por unidade e ala" tone="accent" /><MetricCard label="Estoque crítico" value={`${criticalSupplies}`} detail="Itens abaixo do estoque mínimo" tone="warning" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Status dos módulos críticos</h2><div className="stack-list">{moduleStatuses.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.name}</strong><StatusBadge status={item.status} /></div><p>Latência percebida: {item.latency}</p></article>))}</div></Panel><Panel><h2>Indicadores por unidade</h2>{units.map((item) => (<div key={item.id} className="bar-row"><span>{item.name}</span><div className="bar-track"><div className="bar-track__fill" style={{ width: `${item.occupancy}%` }} /></div><strong>{item.occupancy}%</strong></div>))}</Panel></div></div>
+    return <div className="page-grid"><SectionIntro eyebrow="Dashboard administrativo" title="Visão geral da operação" description="Acompanhe os principais indicadores, a disponibilidade e os riscos da rede VidaPlus." actions={<div className="button-row"><button className="button button--primary" type="button" onClick={() => navigate('security')}>Abrir auditoria</button><button className="button button--ghost" type="button" onClick={() => navigate('beds')}>Ver leitos</button></div>} /><div className="metric-grid"><MetricCard label="Disponibilidade" value={availabilitySnapshot.availability} detail="Meta institucional representada em tela" tone="success" /><MetricCard label="Último backup" value={availabilitySnapshot.backup} detail="Rastreabilidade visual do protótipo" /><MetricCard label="Leitos ocupados" value={`${occupiedBeds}`} detail="Com controle por unidade e ala" tone="accent" /><MetricCard label="Estoque crítico" value={`${criticalSupplies}`} detail="Itens abaixo do estoque mínimo" tone="warning" /></div><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Status dos módulos críticos</h2><div className="stack-list">{moduleStatuses.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><strong>{item.name}</strong><StatusBadge status={item.status} /></div><p>Latência percebida: {item.latency}</p></article>))}</div></Panel><Panel><h2>Indicadores por unidade</h2>{units.map((item) => (<div key={item.id} className="bar-row"><span>{item.name}</span><div className="bar-track"><div className="bar-track__fill" style={{ width: `${item.occupancy}%` }} /></div><strong>{item.occupancy}%</strong></div>))}</Panel></div></div>
   }
 
   function renderWorkspaceContent() {
@@ -4075,15 +4057,22 @@ function App() {
         <div className="workspace-shell">
           <aside className={`sidebar ${mobileMenuOpen ? 'is-open' : ''}`}>
             <div className="sidebar__brand">
-              <span className="brand-badge">SGHSS VidaPlus</span>
-              <h2>{activeMeta.label}</h2>
-              <p>{activeMeta.description}</p>
+              <img
+                className="sidebar__logo"
+                src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg"
+                alt="VidaPlus"
+              />
+              <span className="sidebar__profile">{activeMeta.label}</span>
             </div>
             <nav className="sidebar__nav" aria-label="Menu lateral">
-              {visibleSidebarMenu.map((item: MenuItem) => (
-                <button key={item.key} type="button" className={`sidebar__item ${currentView === item.key ? 'is-active' : ''}`} onClick={() => navigate(item.key)}><strong>{item.label}</strong><span>{item.description}</span></button>
+              {activeMenu.map((item: MenuItem) => (
+                <button key={item.key} type="button" className={`sidebar__item ${currentView === item.key ? 'is-active' : ''}`} onClick={() => navigate(item.key)}>
+                  <img className="sidebar__item-icon" src={menuIconPath(item.key)} alt="" aria-hidden="true" />
+                  <span className="sidebar__item-copy"><strong>{item.label}</strong><small>{item.description}</small></span>
+                </button>
               ))}
             </nav>
+            <button className="sidebar__logout" type="button" onClick={resetSession}>Sair</button>
           </aside>
           <button type="button" className={`sidebar-backdrop ${mobileMenuOpen ? 'is-open' : ''}`} aria-label="Fechar menu" onClick={() => setMobileMenuOpen(false)} />
           <main className="main-shell">
@@ -4111,6 +4100,7 @@ function App() {
               <div className="topbar__controls topbar__controls--workspace">
                 <label className="search-field search-field--compact">
                   <span className="sr-only">Pesquisar</span>
+                  <img className="search-field__icon" src="/brand/icons/Vetorial_SVG/busca.svg" alt="" aria-hidden="true" />
                   <input
                     value={globalSearch}
                     onChange={(event) => setGlobalSearch(event.target.value)}
@@ -4131,164 +4121,33 @@ function App() {
                     ))}
                   </select>
                 ) : null}
-                <div
-                  className={`topbar__menu-group ${quickMenuOpen ? 'is-open' : ''}`}
-                  ref={quickMenuRef}
-                >
-                  <button
-                    className="button button--ghost topbar__dropdown-trigger"
-                    type="button"
-                    aria-haspopup="menu"
-                    aria-expanded={quickMenuOpen}
-                    aria-label={`Abrir menu do usuário ${sessionUserName(sessionProfile)}`}
-                    onClick={() => setQuickMenuOpen((current) => !current)}
-                  >
-                    <span className="sr-only">{activeMeta.label}</span>
-                    <span className="topbar__launcher-grid" aria-hidden="true">
-                      {Array.from({ length: 9 }).map((_, index) => (
-                        <span key={index} className="topbar__launcher-dot" />
-                      ))}
-                    </span>
-                  </button>
-                  {quickMenuOpen ? (
-                    <div className="topbar__dropdown" role="menu" aria-label={`Atalhos do perfil ${activeMeta.label}`}>
-                      <div className="topbar__dropdown-header">
-                        <span className="section-intro__eyebrow">{activeMeta.label}</span>
-                        <strong>{sessionUserName(sessionProfile)}</strong>
-                        <p>{activeQuickMenuConfig.title}</p>
-                      </div>
-                      <div className="topbar__dropdown-list">
-                        {quickMenuItems.map((item) => (
-                          <button
-                            key={item.key}
-                            className={`topbar__dropdown-item ${currentView === item.key ? 'is-active' : ''}`}
-                            type="button"
-                            role="menuitem"
-                            onClick={() => navigate(item.key)}
-                          >
-                            <strong>{item.label}</strong>
-                            <span>{item.description}</span>
-                          </button>
-                        ))}
-                      </div>
-                      <button
-                        className="topbar__dropdown-item topbar__dropdown-item--danger"
-                        type="button"
-                        role="menuitem"
-                        onClick={resetSession}
-                      >
-                        <strong>Encerrar sessão</strong>
-                        <span>Sair do ambiente atual com segurança.</span>
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
               </div>
             </header>
             <div className="page-shell">{renderWorkspaceContent()}</div>
           </main>
         </div>
       ) : (
-        <div className="auth-shell auth-shell--minimal">
-          <aside className="auth-hero">
-            <div className="auth-hero__copy">
-              <span className="brand-badge">VidaPlus</span>
-              <h1>SGHSS</h1>
-              <p>
-                Ambiente acadêmico de gestão hospitalar com acesso por perfil e navegação guiada.
-              </p>
-            </div>
-
-            <div className="auth-hero__summary">
-              <div className="auth-summary-pill">
-                <span>Acesso</span>
-                <strong>Paciente, profissional e administrador</strong>
-              </div>
-              <div className="auth-summary-pill">
-                <span>Uso</span>
-                <strong>Dados fictícios para demonstração</strong>
-              </div>
-            </div>
-
-            <div className="auth-hero__guide">
-              <div className="auth-guide-card">
-                <strong>Fluxo simples</strong>
-                <p>Escolha o perfil, entre e navegue pelos módulos principais do sistema.</p>
-              </div>
-              <div className="auth-guide-card">
-                <strong>Sem excesso de contexto</strong>
-                <p>Somente o necessário antes do acesso para facilitar a decisão do usuário.</p>
-              </div>
-            </div>
-
-            <div className="auth-hero__preview">
-              <div className="auth-preview__topbar">
-                <div>
-                  <span className="auth-preview__eyebrow">Central assistencial</span>
-                  <strong>Painel operacional VidaPlus</strong>
-                </div>
-                <StatusBadge status="Operação estável" />
-              </div>
-
-              <div className="auth-preview__metrics">
-                <article className="auth-preview__metric">
-                  <span>Próxima consulta</span>
-                  <strong>{upcomingAppointments[0].time}</strong>
-                  <p>{upcomingAppointments[0].specialty}</p>
-                </article>
-                <article className="auth-preview__metric">
-                  <span>Exames pendentes</span>
-                  <strong>{pendingExams}</strong>
-                  <p>Com preparo e lembretes</p>
-                </article>
-                <article className="auth-preview__metric">
-                  <span>Leitos livres</span>
-                  <strong>{availableBeds}</strong>
-                  <p>Prontos para alocação</p>
-                </article>
-                <article className="auth-preview__metric">
-                  <span>Estoque crítico</span>
-                  <strong>{criticalSupplies}</strong>
-                  <p>Reposição priorizada</p>
-                </article>
-              </div>
-
-              <div className="auth-preview__board">
-                <div className="auth-preview__column">
-                  <div className="auth-preview__card auth-preview__card--strong">
-                    <span>Fluxos cobertos</span>
-                    <strong>Consultas, telemedicina, prontuário e auditoria</strong>
-                    <p>Navegação clicável por perfil com dados fictícios e feedback visual.</p>
-                  </div>
-                  <div className="auth-preview__card">
-                    <span>Consulta em destaque</span>
-                    <strong>
-                      {upcomingAppointments[0].professional} - {upcomingAppointments[0].modality}
-                    </strong>
-                    <p>
-                      {upcomingAppointments[0].unit} - {formatDate(upcomingAppointments[0].date)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="auth-preview__column">
-                  <div className="auth-preview__module-list">
-                    {moduleStatuses.slice(0, 4).map((item) => (
-                      <div key={item.id} className="auth-preview__module-item">
-                        <div>
-                          <strong>{item.name}</strong>
-                          <span>{item.latency}</span>
-                        </div>
-                        <StatusBadge status={item.status} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        <div className="auth-shell auth-shell--brand">
+          <main className="auth-card auth-card--brand">
+            <img
+              className="auth-card__logo"
+              src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg"
+              alt="VidaPlus - Gestão inteligente em saúde"
+            />
+            {renderAuthContent()}
+          </main>
+          <aside className="auth-hero auth-hero--brand">
+            <img
+              className="auth-hero__logo"
+              src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal.svg"
+              alt="VidaPlus"
+            />
+            <div className="auth-hero__message">
+              <span>Gestão inteligente em saúde</span>
+              <h2>Cuidado conectado,<br /><em>saúde mais próxima.</em></h2>
+              <p>Uma experiência segura, humana e simples em todas as etapas do atendimento.</p>
             </div>
           </aside>
-
-          <main className="auth-card auth-card--minimal">{renderAuthContent()}</main>
         </div>
       )}
 

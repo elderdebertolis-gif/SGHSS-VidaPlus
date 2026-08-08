@@ -1,0 +1,10 @@
+{
+  "logoPrincipal": "01_Logos/Vetorial_SVG/vidaplus_logo_horizontal.svg",
+  "logoCompacto": "01_Logos/Vetorial_SVG/vidaplus_logo_horizontal_sem_assinatura.svg",
+  "simbolo": "01_Logos/Vetorial_SVG/vidaplus_simbolo_colorido.svg",
+  "appIcon": "01_Logos/Favicon_App/icon-1024.png",
+  "iconsFolder": "02_Icones/Vetorial_SVG",
+  "backgroundsFolder": "03_Fundos",
+  "css": "04_Design_Tokens/vidaplus.css",
+  "tokens": "04_Design_Tokens/tokens.json"
+}

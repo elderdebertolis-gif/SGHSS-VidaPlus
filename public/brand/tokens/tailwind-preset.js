@@ -1,0 +1,1 @@
+export const vidaPlusTheme={colors:{blue:'#1E4FA3',green:'#2DBE7F',cyan:'#00B8C9',white:'#FFFFFF',gray:'#F2F4F7',graphite:'#263238'}};
