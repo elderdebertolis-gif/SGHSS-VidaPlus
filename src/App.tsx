@@ -168,9 +168,13 @@ const menuIconPaths: Record<string, string> = {
   permissions: 'configuracoes',
 }
 
+function brandAssetPath(path: string) {
+  return `${import.meta.env.BASE_URL}brand/${path}`
+}
+
 function menuIconPath(key: string) {
   const icon = menuIconPaths[key] ?? 'dashboard'
-  return `/brand/icons/Vetorial_SVG/${icon}.svg`
+  return brandAssetPath(`icons/Vetorial_SVG/${icon}.svg`)
 }
 
 function formatMoney(value: number) {
@@ -4059,7 +4063,7 @@ function App() {
             <div className="sidebar__brand">
               <img
                 className="sidebar__logo"
-                src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg"
+                src={brandAssetPath('logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg')}
                 alt="VidaPlus"
               />
               <span className="sidebar__profile">{activeMeta.label}</span>
@@ -4100,7 +4104,7 @@ function App() {
               <div className="topbar__controls topbar__controls--workspace">
                 <label className="search-field search-field--compact">
                   <span className="sr-only">Pesquisar</span>
-                  <img className="search-field__icon" src="/brand/icons/Vetorial_SVG/busca.svg" alt="" aria-hidden="true" />
+                  <img className="search-field__icon" src={brandAssetPath('icons/Vetorial_SVG/busca.svg')} alt="" aria-hidden="true" />
                   <input
                     value={globalSearch}
                     onChange={(event) => setGlobalSearch(event.target.value)}
@@ -4131,7 +4135,7 @@ function App() {
           <main className="auth-card auth-card--brand">
             <img
               className="auth-card__logo"
-              src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg"
+              src={brandAssetPath('logos/Vetorial_SVG/vidaplus_logo_horizontal_branco.svg')}
               alt="VidaPlus - Gestão inteligente em saúde"
             />
             {renderAuthContent()}
@@ -4139,7 +4143,7 @@ function App() {
           <aside className="auth-hero auth-hero--brand">
             <img
               className="auth-hero__logo"
-              src="/brand/logos/Vetorial_SVG/vidaplus_logo_horizontal.svg"
+              src={brandAssetPath('logos/Vetorial_SVG/vidaplus_logo_horizontal.svg')}
               alt="VidaPlus"
             />
             <div className="auth-hero__message">
