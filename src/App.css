@@ -2057,6 +2057,27 @@ textarea {
   clip: rect(0, 0, 0, 0);
 }
 
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 100;
+  padding: 0.7rem 1rem;
+  border-radius: 999px;
+  color: #ffffff;
+  background: var(--surface-darker);
+  transform: translateY(-160%);
+  transition: transform 0.18s ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.modal-justification-field {
+  margin-top: 1rem;
+}
+
 .panel,
 .metric-card,
 .record-card,
@@ -2527,7 +2548,7 @@ textarea {
 body {
   color: var(--text);
   background-color: var(--bg-1);
-  background-image: url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+  background-image: var(--brand-bg-clinical);
   background-size: cover;
   background-attachment: fixed;
 }
@@ -2588,7 +2609,7 @@ table {
   overflow-y: auto;
   color: #ffffff;
   background-color: #0b4e92;
-  background-image: url('/brand/backgrounds/Desktop_2560x1440/05_gradiente_marca.png');
+  background-image: var(--brand-bg-brand);
   background-size: cover;
   background-position: center;
 }
@@ -2777,7 +2798,7 @@ table {
   background-color: #ffffff;
   background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(242, 250, 252, 0.9)),
-    url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+    var(--brand-bg-clinical);
   background-size: cover;
   background-position: center;
 }
@@ -2843,7 +2864,7 @@ table {
   gap: 1.25rem;
   color: #ffffff;
   background-color: #0b4e92;
-  background-image: url('/brand/backgrounds/Desktop_2560x1440/06_gradiente_menu_lateral.png');
+  background-image: var(--brand-bg-sidebar);
   background-size: cover;
   background-position: center;
   box-shadow: 2px 0 12px rgba(8, 46, 107, 0.16);
@@ -2972,7 +2993,7 @@ table {
   gap: 1rem;
   padding: 0 1.5rem 2.25rem;
   background-color: rgba(242, 244, 247, 0.86);
-  background-image: url('/brand/backgrounds/Desktop_2560x1440/04_padrao_medico_ondas.png');
+  background-image: var(--brand-bg-clinical);
   background-size: cover;
   background-attachment: fixed;
 }
@@ -3238,7 +3259,7 @@ textarea:focus {
   border-radius: 12px;
   background:
     linear-gradient(180deg, rgba(8, 46, 107, 0.08), rgba(8, 46, 107, 0.78)),
-    url('/brand/backgrounds/Desktop_2560x1440/03_gradiente_suave_azul_turquesa.png');
+    var(--brand-bg-telemedicine);
   background-size: cover;
 }
 
@@ -3281,7 +3302,7 @@ textarea:focus {
 
 @media (max-width: 760px) {
   body {
-    background-image: url('/brand/backgrounds/Mobile_1440x2560/04_padrao_medico_ondas.png');
+    background-image: var(--brand-bg-clinical-mobile);
   }
 
   .auth-shell--brand {
@@ -3292,7 +3313,7 @@ textarea:focus {
   .auth-card--brand {
     min-height: 100dvh;
     padding: 2rem 1.35rem;
-    background-image: url('/brand/backgrounds/Mobile_1440x2560/05_gradiente_marca.png');
+    background-image: var(--brand-bg-brand-mobile);
   }
 
   .auth-card__logo {

@@ -23,6 +23,7 @@ export interface PatientProfile {
   address: string
   insurance: string
   allergies: string
+  healthInfo: string
   emergencyContact: string
 }
 
@@ -34,6 +35,7 @@ export interface Appointment {
   date: string
   time: string
   status: string
+  cancellationReason?: string
   modality: string
   guidance: string
 }
@@ -45,6 +47,7 @@ export interface Exam {
   date: string
   time: string
   status: string
+  cancellationReason?: string
   preparation: string
 }
 
@@ -67,6 +70,7 @@ export interface ConsentItem {
 
 export interface TimelineEvent {
   id: string
+  patientId?: string
   date: string
   title: string
   category: string
@@ -334,6 +338,7 @@ export const initialPatientProfile: PatientProfile = {
   address: 'Rua das Araucarias, 180 - Bairro Norte - Florianopolis/SC',
   insurance: 'VidaPlus Essencial',
   allergies: 'Penicilina',
+  healthInfo: 'Hipertensao controlada e acompanhamento cardiologico regular.',
   emergencyContact: 'Luciana Oliveira - 47988114020',
 }
 
@@ -472,6 +477,7 @@ export const initialConsents: ConsentItem[] = [
 export const initialTimeline: TimelineEvent[] = [
   {
     id: 'TL-1',
+    patientId: 'P001',
     date: '2026-05-18',
     title: 'Consulta clínica de acompanhamento',
     category: 'Consulta',
@@ -480,6 +486,7 @@ export const initialTimeline: TimelineEvent[] = [
   },
   {
     id: 'TL-2',
+    patientId: 'P001',
     date: '2026-05-12',
     title: 'Exames laboratoriais de rotina',
     category: 'Exame',
@@ -488,6 +495,7 @@ export const initialTimeline: TimelineEvent[] = [
   },
   {
     id: 'TL-3',
+    patientId: 'P001',
     date: '2026-04-10',
     title: 'Consulta cardiológica',
     category: 'Consulta',
@@ -496,6 +504,7 @@ export const initialTimeline: TimelineEvent[] = [
   },
   {
     id: 'TL-4',
+    patientId: 'P001',
     date: '2026-04-10',
     title: 'Prescrição digital',
     category: 'Prescrição',
@@ -504,11 +513,51 @@ export const initialTimeline: TimelineEvent[] = [
   },
   {
     id: 'TL-5',
+    patientId: 'P001',
     date: '2026-02-21',
     title: 'Atendimento fisioterapeutico',
     category: 'Evolucao',
     professional: 'Marina Soares',
     summary: 'Melhora da mobilidade lombar com orientações domiciliares.',
+  },
+]
+
+export const initialTimelineByProfessionalPatient: TimelineEvent[] = [
+  {
+    id: 'TL-6',
+    patientId: 'P002',
+    date: '2026-06-22',
+    title: 'Consulta por sintomas respiratorios',
+    category: 'Consulta',
+    professional: 'Dr. Rafael Costa',
+    summary: 'Avaliacao inicial registrada e coleta laboratorial solicitada.',
+  },
+  {
+    id: 'TL-7',
+    patientId: 'P002',
+    date: '2026-06-23',
+    title: 'Solicitacao de hemograma',
+    category: 'Exame',
+    professional: 'Laboratorio VidaPlus Diagnosticos',
+    summary: 'Exame pendente de coleta para complementar a avaliacao clinica.',
+  },
+  {
+    id: 'TL-8',
+    patientId: 'P003',
+    date: '2026-06-23',
+    title: 'Visita domiciliar de enfermagem',
+    category: 'Evolucao',
+    professional: 'Equipe VidaPlus Home Care',
+    summary: 'Mobilidade reduzida acompanhada com orientacoes de seguranca no domicilio.',
+  },
+  {
+    id: 'TL-9',
+    patientId: 'P004',
+    date: '2026-06-24',
+    title: 'Reavaliacao clinica durante internacao',
+    category: 'Consulta',
+    professional: 'Dra. Helena Martins',
+    summary: 'Paciente em monitoramento hospitalar com alta prevista em 48 horas.',
   },
 ]
 

@@ -26,6 +26,7 @@ import {
   initialSupplies,
   initialTelemedicineMessages,
   initialTimeline,
+  initialTimelineByProfessionalPatient,
   initialUnits,
   moduleStatuses,
   professionalDemoUser,
@@ -35,6 +36,7 @@ import {
   unitNames,
   unitWings,
 } from './mockData'
+import { normalizeCancellationJustification, validateRegistration } from './validation'
 import type {
   AccessHistoryItem,
   AdminPatientRow,
@@ -70,7 +72,9 @@ interface ConfirmationDialog {
   title: string
   description: string
   confirmLabel: string
-  onConfirm: () => void
+  onConfirm: (justification?: string) => void
+  requireJustification?: boolean
+  justificationLabel?: string
 }
 
 interface DataSubjectRequest {
@@ -396,6 +400,7 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [feedback, setFeedback] = useState<FeedbackMessage | null>(null)
   const [dialog, setDialog] = useState<ConfirmationDialog | null>(null)
+  const [dialogJustification, setDialogJustification] = useState('')
   const [globalSearch, setGlobalSearch] = useState('')
   const deferredSearch = useDeferredValue(globalSearch.trim().toLowerCase())
   const [unitFilter, setUnitFilter] = useState('Todas as unidades')
@@ -411,6 +416,11 @@ function App() {
     cpf: '',
     phone: '',
     email: '',
+    birthDate: '',
+    address: '',
+    healthInfo: '',
+    allergies: '',
+    emergencyContact: '',
     consent: true,
   })
 
@@ -420,7 +430,10 @@ function App() {
   const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
   const [consents, setConsents] = useState<ConsentItem[]>(initialConsents)
   const [dataSubjectRequests, setDataSubjectRequests] = useState<DataSubjectRequest[]>([])
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(initialTimeline)
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([
+    ...initialTimeline,
+    ...initialTimelineByProfessionalPatient,
+  ])
   const [prescriptions, setPrescriptions] = useState<PrescriptionItem[]>(initialPrescriptions)
   const [appointmentDraft, setAppointmentDraft] = useState({
     specialty: specialties[0],
@@ -590,9 +603,12 @@ function App() {
   const isAdminSession = sessionProfile === 'admin'
   const unreadNotifications = notifications.filter((item) => !item.read).length
   const unitOptions = units.map((item) => item.name)
+  const patientTimeline = timeline.filter(
+    (item) => !item.patientId || item.patientId === patientProfile.id,
+  )
   const timelineProfessionalOptions = [
     'Todos os profissionais',
-    ...new Set(timeline.map((item) => item.professional)),
+    ...new Set(patientTimeline.map((item) => item.professional)),
   ]
   const agendaDateOptions = [...new Set(agenda.map((item) => item.date))].sort()
   const auditDateOptions = ['Todas as datas', ...new Set(auditLogs.map((item) => item.date))]
@@ -653,6 +669,9 @@ function App() {
   const occupiedBeds = beds.filter((item) => item.status === 'Ocupado').length
   const selectedProfessionalPatient =
     adminPatients.find((item) => item.id === selectedProfessionalPatientId) ?? adminPatients[0]
+  const selectedProfessionalTimeline = timeline.filter(
+    (item) => !item.patientId || item.patientId === selectedProfessionalPatient.id,
+  )
   const distinctPatients = Array.from(new Map(adminPatients.map((item) => [item.id, item])).values())
   const financeInView = financeReports.filter((item) => matchesUnitFilter(unitFilter, item.unit))
   const totalRevenue = financeInView.reduce((total, item) => total + item.revenue, 0)
@@ -711,7 +730,7 @@ function App() {
         (notificationFilter === 'Lidas' && item.read)) &&
       matchesSearch(deferredSearch, item.title, item.message),
   )
-  const filteredTimeline = timeline.filter(
+  const filteredTimeline = patientTimeline.filter(
     (item) =>
       (timelineFilter === 'Todos' || item.category === timelineFilter) &&
       (timelineProfessionalFilter === 'Todos os profissionais' ||
@@ -955,9 +974,11 @@ function App() {
     title: string,
     description: string,
     confirmLabel: string,
-    onConfirm: () => void,
+    onConfirm: (justification?: string) => void,
+    options: Pick<ConfirmationDialog, 'requireJustification' | 'justificationLabel'> = {},
   ) {
-    setDialog({ title, description, confirmLabel, onConfirm })
+    setDialog({ title, description, confirmLabel, onConfirm, ...options })
+    setDialogJustification('')
   }
 
   function navigate(nextView: string) {
@@ -1092,6 +1113,23 @@ function App() {
 
   function handleRegisterSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    const missingFields = validateRegistration(registerForm)
+    if (missingFields.length > 0) {
+      showFeedback('error', `Preencha: ${missingFields.join(', ')}.`)
+      return
+    }
+
+    setPatientProfile((current) => ({
+      ...current,
+      name: registerForm.name.trim(),
+      cpf: registerForm.cpf.trim(),
+      phone: registerForm.phone.trim(),
+      birthDate: registerForm.birthDate,
+      address: registerForm.address.trim(),
+      healthInfo: registerForm.healthInfo.trim(),
+      allergies: registerForm.allergies.trim() || 'Nenhuma informada',
+      emergencyContact: registerForm.emergencyContact.trim(),
+    }))
     showFeedback('success', 'Pré-cadastro do paciente registrado para validação pela equipe VidaPlus.')
     appendAuditLog('patient', 'Pré-cadastro inicial de paciente', 'Cadastro Inicial')
     setAuthView('login')
@@ -1145,25 +1183,37 @@ function App() {
       'Cancelar consulta',
       `Deseja cancelar ${appointment.specialty} em ${formatDate(appointment.date)} as ${appointment.time}?`,
       'Confirmar cancelamento',
-      () => {
+      (justification) => {
+        const normalizedJustification = normalizeCancellationJustification(justification ?? '')
+        if (!normalizedJustification) {
+          showFeedback('error', 'Informe uma justificativa para cancelar a consulta.')
+          return
+        }
+
         setAppointments((current) =>
           current.map((item) =>
-            item.id === appointmentId ? { ...item, status: 'Cancelado' } : item,
+            item.id === appointmentId
+              ? { ...item, status: 'Cancelado', cancellationReason: normalizedJustification }
+              : item,
           ),
         )
         setNotifications((current) => [
           {
             id: `NT-${Date.now()}`,
             title: 'Consulta cancelada',
-            message: `${appointment.specialty} foi cancelada e a justificativa ficou registrada no protótipo.`,
+            message: `${appointment.specialty} foi cancelada. Motivo: ${normalizedJustification}`,
             time: 'Agora',
             tone: 'warning',
             read: false,
           },
           ...current,
         ])
-        showFeedback('warning', 'Consulta cancelada com justificativa simulada.')
+        showFeedback('warning', 'Consulta cancelada com justificativa registrada.')
         appendAuditLog('patient', 'Cancelamento de consulta', 'Consultas', 'Auditado')
+      },
+      {
+        requireJustification: true,
+        justificationLabel: 'Por que deseja cancelar esta consulta?',
       },
     )
   }
@@ -1205,12 +1255,26 @@ function App() {
       'Cancelar exame',
       `Deseja cancelar ${exam.type} marcado para ${formatDate(exam.date)} as ${exam.time}?`,
       'Cancelar exame',
-      () => {
+      (justification) => {
+        const normalizedJustification = normalizeCancellationJustification(justification ?? '')
+        if (!normalizedJustification) {
+          showFeedback('error', 'Informe uma justificativa para cancelar o exame.')
+          return
+        }
+
         setExams((current) =>
-          current.map((item) => (item.id === examId ? { ...item, status: 'Cancelado' } : item)),
+          current.map((item) =>
+            item.id === examId
+              ? { ...item, status: 'Cancelado', cancellationReason: normalizedJustification }
+              : item,
+          ),
         )
-        showFeedback('warning', 'Exame cancelado no fluxo demonstrativo.')
+        showFeedback('warning', 'Exame cancelado com justificativa registrada.')
         appendAuditLog('patient', 'Cancelamento de exame', 'Exames', 'Auditado')
+      },
+      {
+        requireJustification: true,
+        justificationLabel: 'Por que deseja cancelar este exame?',
       },
     )
   }
@@ -2100,6 +2164,70 @@ function App() {
                 required
               />
             </label>
+            <label className="form-field">
+              <span>Data de nascimento</span>
+              <input
+                type="date"
+                name="birthDate"
+                autoComplete="bday"
+                value={registerForm.birthDate}
+                onChange={(event) =>
+                  setRegisterForm((current) => ({ ...current, birthDate: event.target.value }))
+                }
+                required
+              />
+            </label>
+            <label className="form-field">
+              <span>Telefone de emergência</span>
+              <input
+                name="emergencyContact"
+                autoComplete="tel"
+                inputMode="tel"
+                placeholder="Nome e telefone"
+                value={registerForm.emergencyContact}
+                onChange={(event) =>
+                  setRegisterForm((current) => ({ ...current, emergencyContact: event.target.value }))
+                }
+                required
+              />
+            </label>
+            <label className="form-field form-field--full">
+              <span>Endereço</span>
+              <input
+                name="address"
+                autoComplete="street-address"
+                placeholder="Rua, número, bairro e cidade"
+                value={registerForm.address}
+                onChange={(event) =>
+                  setRegisterForm((current) => ({ ...current, address: event.target.value }))
+                }
+                required
+              />
+            </label>
+            <label className="form-field form-field--full">
+              <span>Informações básicas de saúde</span>
+              <textarea
+                name="healthInfo"
+                placeholder="Condições, medicamentos em uso ou observações relevantes"
+                value={registerForm.healthInfo}
+                onChange={(event) =>
+                  setRegisterForm((current) => ({ ...current, healthInfo: event.target.value }))
+                }
+                rows={3}
+                required
+              />
+            </label>
+            <label className="form-field form-field--full">
+              <span>Alergias conhecidas</span>
+              <input
+                name="allergies"
+                placeholder="Informe alergias ou escreva 'Nenhuma'"
+                value={registerForm.allergies}
+                onChange={(event) =>
+                  setRegisterForm((current) => ({ ...current, allergies: event.target.value }))
+                }
+              />
+            </label>
             <div className="auth-register-consent">
               <label className="checkbox">
                 <input
@@ -2108,6 +2236,7 @@ function App() {
                   onChange={(event) =>
                     setRegisterForm((current) => ({ ...current, consent: event.target.checked }))
                   }
+                  required
                 />
                 <span>Aceito o tratamento de dados para fins assistenciais e contato.</span>
               </label>
@@ -2309,6 +2438,7 @@ function App() {
                 <label className="form-field form-field--full"><span>Endereço</span><input value={patientProfile.address} onChange={(event) => setPatientProfile((current) => ({ ...current, address: event.target.value }))} required /></label>
                 <label className="form-field"><span>Convênio</span><input value={patientProfile.insurance} onChange={(event) => setPatientProfile((current) => ({ ...current, insurance: event.target.value }))} required /></label>
                 <label className="form-field"><span>Alergias</span><input value={patientProfile.allergies} onChange={(event) => setPatientProfile((current) => ({ ...current, allergies: event.target.value }))} /></label>
+                <label className="form-field form-field--full"><span>Informações básicas de saúde</span><textarea value={patientProfile.healthInfo} onChange={(event) => setPatientProfile((current) => ({ ...current, healthInfo: event.target.value }))} rows={3} required /></label>
                 <label className="form-field form-field--full"><span>Contato de emergência</span><input value={patientProfile.emergencyContact} onChange={(event) => setPatientProfile((current) => ({ ...current, emergencyContact: event.target.value }))} required /></label>
               </form>
             </Panel>
@@ -2344,8 +2474,8 @@ function App() {
               </form>
             </Panel>
             <Panel>
-              <div className="toolbar"><h2>Minhas consultas</h2><select value={consultationStatusFilter} onChange={(event) => setConsultationStatusFilter(event.target.value)}><option value="Todas">Todas</option><option value="Agendado">Agendado</option><option value="Confirmado">Confirmado</option><option value="Concluído">Concluído</option><option value="Cancelado">Cancelado</option></select></div>
-              {filteredAppointments.length === 0 ? <EmptyState title="Nenhuma consulta encontrada" description="Ajuste os filtros ou o termo de busca." /> : <div className="stack-list">{filteredAppointments.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><div><strong>{item.specialty}</strong><p>{formatDate(item.date)} as {item.time} " {item.professional}</p></div><StatusBadge status={item.status} /></div><p className="muted">{item.unit} " {item.modality}</p><p>{item.guidance}</p>{(item.status === 'Agendado' || item.status === 'Confirmado') && <div className="button-row"><button className="button button--ghost" type="button" onClick={() => handleCancelConsultation(item.id)}>Cancelar consulta</button></div>}</article>))}</div>}
+              <div className="toolbar"><h2>Minhas consultas</h2><select aria-label="Filtrar consultas por status" value={consultationStatusFilter} onChange={(event) => setConsultationStatusFilter(event.target.value)}><option value="Todas">Todas</option><option value="Agendado">Agendado</option><option value="Confirmado">Confirmado</option><option value="Concluído">Concluído</option><option value="Cancelado">Cancelado</option></select></div>
+              {filteredAppointments.length === 0 ? <EmptyState title="Nenhuma consulta encontrada" description="Ajuste os filtros ou o termo de busca." /> : <div className="stack-list">{filteredAppointments.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><div><strong>{item.specialty}</strong><p>{formatDate(item.date)} as {item.time} " {item.professional}</p></div><StatusBadge status={item.status} /></div><p className="muted">{item.unit} " {item.modality}</p><p>{item.guidance}</p>{item.cancellationReason ? <p className="hint-text"><strong>Justificativa do cancelamento:</strong> {item.cancellationReason}</p> : null}{(item.status === 'Agendado' || item.status === 'Confirmado') && <div className="button-row"><button className="button button--ghost" type="button" onClick={() => handleCancelConsultation(item.id)}>Cancelar consulta</button></div>}</article>))}</div>}
             </Panel>
           </div>
         </div>
@@ -2368,8 +2498,8 @@ function App() {
               </form>
             </Panel>
             <Panel>
-              <div className="toolbar"><h2>Meus exames</h2><select value={examStatusFilter} onChange={(event) => setExamStatusFilter(event.target.value)}><option value="Todos">Todos</option><option value="Agendado">Agendado</option><option value="Pendente">Pendente</option><option value="Realizado">Realizado</option><option value="Cancelado">Cancelado</option></select></div>
-              <div className="stack-list">{filteredExams.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><div><strong>{item.type}</strong><p>{formatDate(item.date)} as {item.time}</p></div><StatusBadge status={item.status} /></div><p className="muted">{item.unit}</p><p>{item.preparation}</p>{(item.status === 'Agendado' || item.status === 'Pendente') && <div className="button-row"><button className="button button--ghost" type="button" onClick={() => handleCancelExam(item.id)}>Cancelar exame</button></div>}</article>))}</div>
+              <div className="toolbar"><h2>Meus exames</h2><select aria-label="Filtrar exames por status" value={examStatusFilter} onChange={(event) => setExamStatusFilter(event.target.value)}><option value="Todos">Todos</option><option value="Agendado">Agendado</option><option value="Pendente">Pendente</option><option value="Realizado">Realizado</option><option value="Cancelado">Cancelado</option></select></div>
+              <div className="stack-list">{filteredExams.map((item) => (<article key={item.id} className="record-card"><div className="record-card__header"><div><strong>{item.type}</strong><p>{formatDate(item.date)} as {item.time}</p></div><StatusBadge status={item.status} /></div><p className="muted">{item.unit}</p><p>{item.preparation}</p>{item.cancellationReason ? <p className="hint-text"><strong>Justificativa do cancelamento:</strong> {item.cancellationReason}</p> : null}{(item.status === 'Agendado' || item.status === 'Pendente') && <div className="button-row"><button className="button button--ghost" type="button" onClick={() => handleCancelExam(item.id)}>Cancelar exame</button></div>}</article>))}</div>
             </Panel>
           </div>
         </div>
@@ -2386,7 +2516,7 @@ function App() {
           />
           <Panel>
             <div className="toolbar toolbar--dense">
-              <select value={timelineFilter} onChange={(event) => setTimelineFilter(event.target.value)}>
+              <select aria-label="Filtrar histórico por categoria" value={timelineFilter} onChange={(event) => setTimelineFilter(event.target.value)}>
                 <option value="Todos">Todos</option>
                 <option value="Consulta">Consulta</option>
                 <option value="Exame">Exame</option>
@@ -2395,6 +2525,7 @@ function App() {
                 <option value="Telemedicina">Telemedicina</option>
               </select>
               <select
+                aria-label="Filtrar histórico por profissional"
                 value={timelineProfessionalFilter}
                 onChange={(event) => setTimelineProfessionalFilter(event.target.value)}
               >
@@ -2405,6 +2536,7 @@ function App() {
                 ))}
               </select>
               <select
+                aria-label="Filtrar histórico por período"
                 value={timelinePeriodFilter}
                 onChange={(event) => setTimelinePeriodFilter(event.target.value)}
               >
@@ -2799,7 +2931,7 @@ function App() {
     }
 
     if (currentView === 'records') {
-      return <div className="page-grid"><SectionIntro eyebrow="Prontuário eletrônico" title={`Registro clínico de ${selectedProfessionalPatient.name}`} description="Consulta de dados básicos, histórico resumido, sinais vitais e conduta." /><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Resumo do paciente</h2><ul className="detail-list"><li><span>CPF mascarado</span><strong>{selectedProfessionalPatient.id === patientProfile.id ? maskCpf(patientProfile.cpf) : '***.***.***-**'}</strong></li><li><span>Último atendimento</span><strong>{selectedProfessionalPatient.lastVisit}</strong></li><li><span>Próximo passo</span><strong>{selectedProfessionalPatient.nextStep}</strong></li></ul><ul className="bullet-list">{selectedProfessionalPatient.alerts.map((alert) => <li key={alert}>{alert}</li>)}</ul></Panel><Panel><form className="form-grid" onSubmit={handleSaveClinicalNote}><label className="form-field form-field--full"><span>Sintomas</span><textarea value={clinicalNote.symptoms} onChange={(event) => setClinicalNote((current) => ({ ...current, symptoms: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Diagnóstico</span><textarea value={clinicalNote.diagnosis} onChange={(event) => setClinicalNote((current) => ({ ...current, diagnosis: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Conduta</span><textarea value={clinicalNote.conduct} onChange={(event) => setClinicalNote((current) => ({ ...current, conduct: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Observações</span><textarea value={clinicalNote.observations} onChange={(event) => setClinicalNote((current) => ({ ...current, observations: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Sinais vitais</span><input value={clinicalNote.vitals} onChange={(event) => setClinicalNote((current) => ({ ...current, vitals: event.target.value }))} /></label><div className="button-row button-row--end"><button className="button button--primary" type="submit">Salvar evolução clínica</button></div></form></Panel></div></div>
+      return <div className="page-grid"><SectionIntro eyebrow="Prontuário eletrônico" title={`Registro clínico de ${selectedProfessionalPatient.name}`} description="Consulta de dados básicos, histórico resumido, sinais vitais e conduta." /><div className="content-grid content-grid--wide"><Panel className="panel--accent"><h2>Resumo do paciente</h2><ul className="detail-list"><li><span>CPF mascarado</span><strong>{selectedProfessionalPatient.id === patientProfile.id ? maskCpf(patientProfile.cpf) : '***.***.***-**'}</strong></li><li><span>Último atendimento</span><strong>{selectedProfessionalPatient.lastVisit}</strong></li><li><span>Próximo passo</span><strong>{selectedProfessionalPatient.nextStep}</strong></li></ul><ul className="bullet-list">{selectedProfessionalPatient.alerts.map((alert) => <li key={alert}>{alert}</li>)}</ul><div className="professional-history"><h3>Linha do tempo clínica</h3><p className="hint-text">Histórico completo de eventos assistenciais deste paciente.</p>{selectedProfessionalTimeline.length > 0 ? <div className="timeline">{selectedProfessionalTimeline.map((item) => <article key={item.id} className="timeline-item"><div className="timeline-item__marker" /><div className="timeline-item__content"><div className="record-card__header"><div><strong>{item.title}</strong><p>{item.professional} - {formatDate(item.date)}</p></div><StatusBadge status={item.category} /></div><p>{item.summary}</p></div></article>)}</div> : <EmptyState title="Sem histórico clínico" description="Ainda não há eventos registrados para este paciente." />}</div></Panel><Panel><form className="form-grid" onSubmit={handleSaveClinicalNote}><label className="form-field form-field--full"><span>Sintomas</span><textarea value={clinicalNote.symptoms} onChange={(event) => setClinicalNote((current) => ({ ...current, symptoms: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Diagnóstico</span><textarea value={clinicalNote.diagnosis} onChange={(event) => setClinicalNote((current) => ({ ...current, diagnosis: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Conduta</span><textarea value={clinicalNote.conduct} onChange={(event) => setClinicalNote((current) => ({ ...current, conduct: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Observações</span><textarea value={clinicalNote.observations} onChange={(event) => setClinicalNote((current) => ({ ...current, observations: event.target.value }))} rows={3} /></label><label className="form-field form-field--full"><span>Sinais vitais</span><input value={clinicalNote.vitals} onChange={(event) => setClinicalNote((current) => ({ ...current, vitals: event.target.value }))} /></label><div className="button-row button-row--end"><button className="button button--primary" type="submit">Salvar evolução clínica</button></div></form></Panel></div></div>
     }
 
     if (currentView === 'prescriptions') {
@@ -4059,6 +4191,7 @@ function App() {
     <>
       {sessionProfile ? (
         <div className="workspace-shell">
+          <a className="skip-link" href="#main-content">Pular para o conteúdo principal</a>
           <aside className={`sidebar ${mobileMenuOpen ? 'is-open' : ''}`}>
             <div className="sidebar__brand">
               <img
@@ -4070,7 +4203,7 @@ function App() {
             </div>
             <nav className="sidebar__nav" aria-label="Menu lateral">
               {activeMenu.map((item: MenuItem) => (
-                <button key={item.key} type="button" className={`sidebar__item ${currentView === item.key ? 'is-active' : ''}`} onClick={() => navigate(item.key)}>
+                <button key={item.key} type="button" className={`sidebar__item ${currentView === item.key ? 'is-active' : ''}`} aria-current={currentView === item.key ? 'page' : undefined} onClick={() => navigate(item.key)}>
                   <img className="sidebar__item-icon" src={menuIconPath(item.key)} alt="" aria-hidden="true" />
                   <span className="sidebar__item-copy"><strong>{item.label}</strong><small>{item.description}</small></span>
                 </button>
@@ -4079,7 +4212,7 @@ function App() {
             <button className="sidebar__logout" type="button" onClick={resetSession}>Sair</button>
           </aside>
           <button type="button" className={`sidebar-backdrop ${mobileMenuOpen ? 'is-open' : ''}`} aria-label="Fechar menu" onClick={() => setMobileMenuOpen(false)} />
-          <main className="main-shell">
+          <main className="main-shell" id="main-content">
             <header className="topbar topbar--workspace">
               <div className="topbar__heading topbar__heading--workspace">
                 <button
@@ -4114,6 +4247,7 @@ function App() {
                 {isAdminSession ? (
                   <select
                     className="topbar__unit-filter"
+                    aria-label="Filtrar por unidade"
                     value={unitFilter}
                     onChange={(event) => setUnitFilter(event.target.value)}
                   >
@@ -4157,7 +4291,7 @@ function App() {
 
       {feedback ? <div className={`toast toast--${feedback.tone}`} role="status" aria-live="polite">{feedback.message}</div> : null}
 
-      {dialog ? <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title"><div className="modal-card"><h2 id="dialog-title">{dialog.title}</h2><p>{dialog.description}</p><div className="button-row button-row--end"><button className="button button--ghost" type="button" onClick={() => setDialog(null)}>Fechar</button><button className="button button--primary" type="button" onClick={() => { dialog.onConfirm(); setDialog(null) }}>{dialog.confirmLabel}</button></div></div></div> : null}
+      {dialog ? <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dialog-title" aria-describedby="dialog-description"><div className="modal-card"><h2 id="dialog-title">{dialog.title}</h2><p id="dialog-description">{dialog.description}</p>{dialog.requireJustification ? <label className="form-field modal-justification-field"><span>{dialog.justificationLabel ?? 'Justificativa'}</span><textarea value={dialogJustification} onChange={(event) => setDialogJustification(event.target.value)} rows={4} required autoFocus /></label> : null}<div className="button-row button-row--end"><button className="button button--ghost" type="button" onClick={() => setDialog(null)}>Fechar</button><button className="button button--primary" type="button" disabled={dialog.requireJustification && !dialogJustification.trim()} onClick={() => { dialog.onConfirm(dialogJustification); setDialog(null) }}>{dialog.confirmLabel}</button></div></div></div> : null}
     </>
   )
 }
