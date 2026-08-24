@@ -2265,7 +2265,7 @@ function App() {
             title="Tratamento de dados pessoais"
             description="Resumo visual da política da VidaPlus, com foco em clareza e transparência."
           />
-          <Panel className="panel--accent">
+          <Panel className="panel--accent auth-legal-panel">
             <ul className="bullet-list">
               <li>Dados clínicos são restritos ao contexto assistencial e ? auditoria autorizada.</li>
               <li>CPF e telefone aparecem mascarados fora de formulários de edição.</li>
@@ -2291,7 +2291,7 @@ function App() {
             title="Aviso de uso de dados"
             description="Tela demonstrativa do aceite inicial de dados pessoais e sensíveis."
           />
-          <Panel>
+          <Panel className="auth-legal-panel">
             <ul className="bullet-list">
               <li>Uso de dados para consultas, exames, internações, telemedicina e continuidade assistencial.</li>
               <li>Compartilhamento interno apenas entre unidades autorizadas da VidaPlus.</li>

@@ -2661,6 +2661,22 @@ table {
   color: #ffffff;
 }
 
+.auth-card--brand .auth-legal-panel,
+.auth-card--brand .auth-legal-panel p,
+.auth-card--brand .auth-legal-panel li {
+  color: var(--text);
+}
+
+.auth-card--brand .auth-legal-panel h2,
+.auth-card--brand .auth-legal-panel h3,
+.auth-card--brand .auth-legal-panel strong {
+  color: var(--text-strong);
+}
+
+.auth-legal-panel .bullet-list {
+  line-height: 1.6;
+}
+
 .auth-login-header {
   gap: 0.45rem;
 }
